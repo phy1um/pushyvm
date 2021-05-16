@@ -9,50 +9,53 @@ Programs are executed in a **machine**. A machine consists of **memory** and **r
 A code is a 2-byte machine instruction. It can be separated into 2 parts, the first byte is the *Op* and the second byte is the *Arg*. Op determines what kind of action will be performed, while Arg allows this operation to be customized, sometimes beyond the ISA specification such as in the case of interrupts.
 
 ### Registers
-The VM contains 4 registers named A, B, SP and PC. They behave as follows:
+The VM contains 3 registers named TGT, SP and PC. They behave as follows:
 
 #### SP Register
-The Stack Pointer (SP) is a reference in memory to the current head of the stack. Pushing will write a value to MEMORY[SP], then decrement SP. Popping from the stack will increment SP, then return MEMORY[SP]
+The Stack Pointer (SP) is a reference in memory to the current head of the stack. Pushing will write a value to RAM[SP], then decrement SP. Popping from the stack will increment SP, then return RAM[SP]
 
 #### PC Register
-The Program Counter (PC) is a reference to the location in memory of the next code to execute. When the machine updates, it evaluates the code at MEMORY[SP] and advances PC by at least one - with the exception of jump and branch instructions which can also move PC backwards.
+The Program Counter (PC) is a reference to the location in memory of the next code to execute. When the machine updates, it evaluates the code at RAM[SP] and advances PC by at least one - with the exception of jump and branch instructions which can also move PC backwards.
 
-#### A and B register
-The are temporary registers used for computations. Elements are popped off of the stack into a register. They are internal to the implementation of the ISA and should not be important outside of implementing core operations.
-
+#### TGT Register
+The TGT register is used as an intermediate location between completed calculations/memory access and the stack.
 
 ## Arithmetic
 
 |Name|Op|Arg|Stack Before|Stack After|Description|
 |---|---|---|---|---|---|
-|Add|0x2|?|[a b]|[c]| c = a+b|
-|Sub|0x4|?|[a b]|[c]| c = a-b|
-|Mul|0x6|?|[a b]|[c]| c = a\*b|
-|Div|0x8|?|[a b]|[c]| c = a / b|
-|Mod|0xa|?|[a b]|[c]| c = a % b|
+|Add|0x2|0|[a b]|[c]| c = a+b|
+|Sub|0x4|0|[a b]|[c]| c = a-b|
+|Mul|0x6|0|[a b]|[c]| c = a\*b|
+|Div|0x8|0|[a b]|[c]| c = a / b|
+|Mod|0xa|0|[a b]|[c]| c = a % b|
+
+If Arg=1 then the TGT register is set to the result and nothing is pushed to the stack
+
 
 ## Stack Manipulation
 |Name|Op|Arg|Stack Before|Stack After|Description|
 |---|---|---|---|---|---|
-|Lli|0x50|a|[]|[a]|Load 1byte value to stack|
-|Lbi|0x52|?|[]|[a]|a = \*(PC+1); PC += 2|
-|Pop|0x54|0x0|[a]|[]|Remove top of stack|
-|Pop[x]|0x54|0x1-0xf|[a]|[]|Remove top of stack, writing to machine port|
-|Dup|0x56|?|[a]|[a a]|Duplicate top of stack|
-|Shf|0x58|?|[a b c]|[a c b]|Shuffle tail elements|
+|Ldi|0x50|a|[]|[a]|RAM[SP--] = a|
+|Ldp|0x52|?|[]|[a]|RAM[SP--] = RAM[PC+1]; PC += 2; (Load 2 byte immediate from program to stack)|
+|Pop|0x54|0|[a]|[]|TGT = a|
+|Pop[x]|0x54|0x1-0xf|[a]|[]|Port[x] <- a|
+|Dup|0x56|?|[a]|[a a]|v=RAM[SP]; RAM[SP--]v;|
+|Rot|0x58|?|[a b c]|[b c a]|Rotate top 3 elements of stack|
 |Swp|0x5a|?|[a b]|[b a]|Swap head elements|
+|Del|0x5c|0|[a]|[]|SP++|
+|Psh|0x5e|0|[]|[a]|RAM[SP++] = TGT|
+
+|Ldm|0x40|0|[x]|[]| TGT = RAM[x]|
+|Set|0x42|0|[x]|[]| RAM[x] = TGT|
 
 ## Control
 |Name|Op|Arg|Stack Before|Stack After|Description|
 |---|---|---|---|---|---|
 |Jmp|0x60|0|[a]|[]|PC=a|
-|Jmp|0x60|1|[a]|[]|PC+=a|
-|JIm|0x62|0|[]|[]|PC=\*(PC+1)|
-|JIm|0x62|1|[]|[]|PC+=\*(PC+1)|
+|Jmr|0x60|1|[a]|[]|PC+=a|
 |Bx?|0x64|0|[a b]|[]|IF b != 0 THEN PC=a|
 |Bx?|0x64|1|[a b]|[]|IF b != 0 THEN PC+=a|
-|Bi?|0x66|0|[a]|[]|IF a != 0 THEN PC=\*(PC+1)|
-|Bi?|0x66|1|[a]|[]|IF a != 0 THEN PC+=\*(PC+1)|
 
 ## Logic
 |Name|Op|Arg|Stack Before|Stack After|Description|
@@ -76,5 +79,5 @@ The are temporary registers used for computations. Elements are popped off of th
 |SYS[INITMEM]|0x70|0|[a]|[]|Initialize machine with 2\*a bytes of memory|
 |SYS[COPY]|0x70|1|[a b]|[]|Copy the next a codes to address starting at b; PC += a|
 |SYS[STACKADDR]|0x70|2|[a]|[]|Set stack address to PC+1; PC += 2|
-|INT[x]|0x71|x|?|?|Flag system interrupt, stack can be modified as handler sees fit|
+|INT[x]|0x71|x|?|?|Flag system interrupt x, stack can be modified as handler sees fit|
 
