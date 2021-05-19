@@ -58,17 +58,17 @@ The are temporary registers used for computations. Elements are popped off of th
 |Name|Op|Arg|Stack Before|Stack After|Description|
 |---|---|---|---|---|---|
 |GT|0x20|0|[a b]|[c]|c = IF a > b THEN 1 ELSE 0|
-|GTE|0x20|1|[a b]|[c]|c = IF a >= b THEN 1 ELSE 0|
-|LT|0x22|0|[a b]|[c]|c = IF a < b THEN 1 ELSE 0|
-|LTE|0x22|1|[a b]|[c]|c = IF a <= b THEN 1 ELSE 0|
-|EQ|0x24|0|[a b]|[c]|c = IF a = b THEN 1 ELSE 0|
-|NEQ|0x24|1|[a b]|[c]|c = IF a != b THEN 1 ELSE 0|
-|NOT|0x26|0|[a]|[b]|b = IF a != 0 THEN 0 ELSE 1|
-|AND|0x28|0|[a b]|[c]|c = a & b|
-|OR|0x2a|0|[a b]|[c]|c = a \| b|
-|XOR|0x2c|0|[a b]|[c]|c = a XOR b|
-|SHL|0x2e|x|[a]|[c]|c = a << x|
-|SHR|0x30|x|[a]|[c]|c = a >> x|
+|GTE|0x22|1|[a b]|[c]|c = IF a >= b THEN 1 ELSE 0|
+|LT|0x24|0|[a b]|[c]|c = IF a < b THEN 1 ELSE 0|
+|LTE|0x26|1|[a b]|[c]|c = IF a <= b THEN 1 ELSE 0|
+|EQ|0x28|0|[a b]|[c]|c = IF a = b THEN 1 ELSE 0|
+|NEQ|0x2a|1|[a b]|[c]|c = IF a != b THEN 1 ELSE 0|
+|NOT|0x2c|0|[a]|[b]|b = IF a != 0 THEN 0 ELSE 1|
+|AND|0x2e|0|[a b]|[c]|c = a & b|
+|OR|0x30|0|[a b]|[c]|c = a \| b|
+|XOR|0x32|0|[a b]|[c]|c = a XOR b|
+|SHL|0x34|x|[a]|[c]|c = a << x|
+|SHR|0x36|x|[a]|[c]|c = a >> x|
 
 ## Machine
 |Name|Op|Arg|Stack Before|Stack After|Description|
