@@ -132,7 +132,7 @@ for k,v in op.__dict__.items():
         sym = "bx?"
     if sym == "bi":
         sym = "bi?"
-    print(f"Defining {sym} = {v}")
+    #print(f"Defining {sym} = {v}")
     define_word(sym, op_lit(v))
 
 define_word(":", inline_byte)

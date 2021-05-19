@@ -24,10 +24,10 @@ if __name__ == "__main__":
     f = open(args.file, "rb")
     tape = f.read()
     f.close()
-    words = unpack_2b(tape)
+    program = unpack_2b(tape)
     vm = Machine(5*1024)
     vm.bind_port(1, sys.stdout)
-    vm.copy(words, 0)
+    vm.copy(program, 0)
     vm.interractive = args.inter
     opfuncs = {}
     define_std_env(opfuncs)
@@ -37,6 +37,8 @@ if __name__ == "__main__":
         vm.eval(opfuncs, verbose=args.verbose)
         if args.verbose:
             print(str(vm))
-    print("Done..") 
+    if args.verbose:
+        print("Done") 
+    sys.exit(vm.exit_status)
 
 

@@ -29,6 +29,7 @@ class Machine(object):
         self.port = [PortSink()]*10
         self.halt = False
         self.interractive = False
+        self.exit_status = 1
 
     def bind_port(self, i, f):
         self.port[i] = f
@@ -80,6 +81,7 @@ class Machine(object):
 def trigger_int(vm, arg):
     if arg == 0:
         vm.halt = True
+        vm.exit_status = 0
     elif arg == 1:
         prompt = ""
         if vm.interractive:
