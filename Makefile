@@ -1,5 +1,5 @@
 
-DOCFILES=spec.html
+DOCFILES=docs/spec.html
 STYLE=milligram.min.css
 COMPILE=compile.py
 
