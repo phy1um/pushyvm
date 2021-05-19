@@ -67,7 +67,7 @@ def compile(s):
         # print(f" -> {op}[{arg}] :: {rest}")
         f = opwords[op]
         b = f(arg, rest)
-        # print(f" -- {b:#x}")
+        print(f" -- {b:#x}")
         tape.append(b)
     return encode_2byteM(tape)
     

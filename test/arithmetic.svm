@@ -1,0 +1,19 @@
+;; test addition +5
+INT[1]
+lii[5]
+add
+pop[1]
+
+;; test subtraction (-5)
+INT[1]
+lii[5]
+sub
+pop[1]
+
+;; test multiplication (*3)
+INT[1]
+lii[3]
+mul
+pop[1]
+
+INT[0]
