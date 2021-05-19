@@ -1,7 +1,7 @@
 ;; Initialize result to 1
 lii[1]
 ;; Read n steps
-INT[1]
+int[1]
 ;; Begin loop
 %LOOP
   ;; [n, n, res]
@@ -36,5 +36,5 @@ swp
 ;; Write
 pop[1]
 ;; HCF
-INT[0]
+int[0]
 

@@ -28,6 +28,7 @@ class Machine(object):
         self.init_memory(r)
         self.port = [PortSink()]*10
         self.halt = False
+        self.interractive = False
 
     def bind_port(self, i, f):
         self.port[i] = f
@@ -40,11 +41,12 @@ class Machine(object):
         for i,w in enumerate(words):
             self.ram[to+i] = w 
 
-    def eval(self, opfuncs):
+    def eval(self, opfuncs, verbose=False):
         cmd = self.readword()
         op = get_op(cmd)
         arg = get_arg(cmd)
-        #print(f"Eval {op:#x}[{arg:#x}]")
+        if verbose:
+            print(f"Eval {op:#x}[{arg:#x}]")
         eval_fn = opfuncs[op]
         eval_fn(self, arg)
 
@@ -79,7 +81,10 @@ def trigger_int(vm, arg):
     if arg == 0:
         vm.halt = True
     elif arg == 1:
-        s = input("> ")
+        prompt = ""
+        if vm.interractive:
+            prompt = "> "
+        s = input(prompt) 
         v = int(s)
         vm.push(v)
     else:

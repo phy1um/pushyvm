@@ -1,5 +1,6 @@
 import struct
 import sys
+import operators as op
 
 opwords = {}
 labels = {}
@@ -92,6 +93,7 @@ def inline_byte(a, rest):
         v = int(rest)
         return v
 
+ignore='''
 # Arithmetic
 define_word("add", op_lit(0x2))
 define_word("sub", op_lit(0x4))
@@ -121,6 +123,17 @@ define_word("not", op_lit(0x26))
 
 define_word("SYS", op_lit(0x70))
 define_word("INT", op_lit(0x71))
+'''
+for k,v in op.__dict__.items():
+    if k[0] == "_":
+        continue
+    sym = k.lower()
+    if sym == "bx":
+        sym = "bx?"
+    if sym == "bi":
+        sym = "bi?"
+    print(f"Defining {sym} = {v}")
+    define_word(sym, op_lit(v))
 
 define_word(":", inline_byte)
 

@@ -32,7 +32,7 @@ def shf_op(vm, arg):
     vm.push(vm.a)
 
 def define_stack_ops(t):
-    t[op.LLI]=lii_op
+    t[op.LII]=lii_op
     t[op.LBI]=lbi_op
     t[op.POP]=pop_op
     t[op.DUP]=dup_op
