@@ -1,0 +1,40 @@
+;; Initialize result to 1
+lii[1]
+;; Read n steps
+INT[1]
+;; Begin loop
+%LOOP
+  ;; [n, n, res]
+  dup
+  ;; [0, n, n, res]
+  lii[1]
+  ;; [(1 < n), n, res]
+  gt 
+  ;; [%END, (1 < n), n, res]
+  lbi
+  : %END
+  bx? 
+  ;; Keep going - [n, res]
+  ;; [n, n, res]
+  dup
+  ;; [n, res, n]
+  shf
+  ;; [n*res, n]
+  mul[1]
+  ;; [n, res]
+  swp
+  lii[1]
+  swp
+  sub
+  lbi
+  : %LOOP
+  jmp
+%END
+;; Stack coming in - [0, res]
+;; [res, 0]
+swp
+;; Write
+pop[1]
+;; HCF
+INT[0]
+

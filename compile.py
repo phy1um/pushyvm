@@ -2,6 +2,7 @@ import struct
 import sys
 
 opwords = {}
+labels = {}
 
 def parse_arg(s):
     parts = s.split("[")
@@ -28,15 +29,33 @@ def encode_2byteM(t):
     fmt = f">{n}h"
     return struct.pack(fmt, *t)
      
+def pre_pass(s):
+    c = 0
+    for line in s.split("\n"):
+        line = line.strip()
+        if len(line) < 1:
+            continue
+        elif line[0] == ";":
+            continue
+        elif line[0] == "%":
+            tok = line[1:]
+            labels[tok] = c
+            continue
+        else:
+            c += 1
 
 def compile(s):
     tape = []
+    w = 0
     for line in s.split("\n"):
-        print("Compiling " + line)
+        line = line.strip()
         if len(line) < 1:
             continue
-        if line[0] == ";":
+        elif line[0] == ";":
             continue
+        elif line[0] == "%":
+            continue
+        print("Compiling " + line)
         toks = line.split(" ")
         op_arg = toks[0]
         rest = ""
@@ -45,14 +64,11 @@ def compile(s):
         op,arg = parse_arg(op_arg) 
         if op not in opwords:
             raise Exception(f"Unknown op {op}")
-        print(f" -> {op}[{arg}] :: {rest}")
+        # print(f" -> {op}[{arg}] :: {rest}")
         f = opwords[op]
         b = f(arg, rest)
-        print(" --", end="")
-        for by in b:
-            print(f" {by:#x}", end="")
-        print()
-        tape += b
+        # print(f" -- {b:#x}")
+        tape.append(b)
     return encode_2byteM(tape)
     
 def define_word(op, f):
@@ -63,20 +79,18 @@ def op_lit(v):
         arg_val = 0
         if a != "":
             arg_val = int(a)
-        print(f"EMIT LIT: {v:#x}:{arg_val:#x}")
-        return [(v<<8) + arg_val]
-    return f
-
-def op_load_imm_next(v):
-    def f(a, rest):
-        imm = int(rest)
-        op_word = op_lit(v)(a,"")
-        return [op_word[0],imm]
+        # print(f"EMIT LIT: {v:#x}:{arg_val:#x}")
+        return (v<<8) + arg_val
     return f
 
 def inline_byte(a, rest):
-    v = int(rest)
-    return [v]
+    rest = rest.strip()
+    if rest[0] == "%":
+        tok = rest[1:]
+        return labels[tok]
+    else:
+        v = int(rest)
+        return v
 
 # Arithmetic
 define_word("add", op_lit(0x2))
@@ -90,6 +104,8 @@ define_word("lii", op_lit(0x50))
 define_word("lbi", op_lit(0x52))
 define_word("pop", op_lit(0x54))
 define_word("dup", op_lit(0x56))
+define_word("shf", op_lit(0x58))
+define_word("swp", op_lit(0x5a))
 
 # Control
 define_word("jmp", op_lit(0x60))
@@ -114,6 +130,7 @@ if __name__ == "__main__":
     file_out = sys.argv[2]
     with open(file_in, "r") as f:
         body = f.read()
+        pre_pass(body)
         prog = compile(body)
         with open(file_out, "wb") as o:
             o.write(prog)

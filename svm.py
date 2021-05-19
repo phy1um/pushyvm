@@ -95,12 +95,51 @@ def pop_op(vm, arg):
     v = vm.pop()
     vm.port[arg].write(str(v)+"\n")
 
+def jmp_op(vm, arg):
+    vm.popa()
+    vm.pc = vm.a
+
 def jim_op(vm, arg):
     tgt = vm.readword()
     if arg == 0:
         vm.pc = tgt
     else:
         vm.pc += tgt-1
+
+def dup_op(vm, arg):
+    vm.popa()
+    vm.push(vm.a)
+    vm.push(vm.a)
+
+def swp_op(vm, arg):
+    vm.popa()
+    vm.popb()
+    vm.push(vm.a)
+    vm.push(vm.b)
+
+def shf_op(vm, arg):
+    vm.popa()
+    vm.popb()
+    c = vm.pop()
+    vm.push(vm.b)
+    vm.push(c)
+    vm.push(vm.a)
+
+def cmp_fn(f):
+    def op(vm, arg):
+        vm.popa()
+        vm.popb()
+        if f(vm.a, vm.b):
+            vm.push(1)
+        else:
+            vm.push(0)
+    return op
+
+def branch(vm, arg):
+    vm.popa()
+    vm.popb()
+    if vm.b != 0:
+        vm.pc = vm.a
 
 def trigger_int(vm, arg):
     if arg == 0:
@@ -115,10 +154,18 @@ def trigger_int(vm, arg):
 
 opfuncs[0x2] = arith_fn(lambda x,y: x+y)
 opfuncs[0x4] = arith_fn(lambda x,y: x-y)
+opfuncs[0x6] = arith_fn(lambda x,y: x*y)
+opfuncs[0x20] = cmp_fn(lambda x,y: x > y)
+opfuncs[0x22] = cmp_fn(lambda x,y: x < y)
 opfuncs[0x50] = lii_op
 opfuncs[0x52] = lbi_op
 opfuncs[0x54] = pop_op
+opfuncs[0x56] = dup_op
+opfuncs[0x58] = shf_op
+opfuncs[0x5a] = swp_op
+opfuncs[0x60] = jmp_op
 opfuncs[0x62] = jim_op
+opfuncs[0x64] = branch
 opfuncs[0x71] = trigger_int
 
 if __name__ == "__main__":

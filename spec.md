@@ -39,16 +39,18 @@ The are temporary registers used for computations. Elements are popped off of th
 |Pop|0x54|0x0|[a]|[]|Remove top of stack|
 |Pop[x]|0x54|0x1-0xf|[a]|[]|Remove top of stack, writing to machine port|
 |Dup|0x56|?|[a]|[a a]|Duplicate top of stack|
+|Shf|0x58|?|[a b c]|[a c b]|Shuffle tail elements|
+|Swp|0x5a|?|[a b]|[b a]|Swap head elements|
 
 ## Control
 |Name|Op|Arg|Stack Before|Stack After|Description|
 |---|---|---|---|---|---|
-|Jmp|0x60|0|[a b]|[]|PC=b|
-|Jmp|0x60|1|[a b]|[]|PC+=b|
+|Jmp|0x60|0|[a]|[]|PC=a|
+|Jmp|0x60|1|[a]|[]|PC+=a|
 |JIm|0x62|0|[]|[]|PC=\*(PC+1)|
 |JIm|0x62|1|[]|[]|PC+=\*(PC+1)|
-|Bx?|0x64|0|[a b]|[]|IF a != 0 THEN PC=b|
-|Bx?|0x64|1|[a b]|[]|IF a != 0 THEN PC+=b|
+|Bx?|0x64|0|[a b]|[]|IF b != 0 THEN PC=a|
+|Bx?|0x64|1|[a b]|[]|IF b != 0 THEN PC+=a|
 |Bi?|0x66|0|[a]|[]|IF a != 0 THEN PC=\*(PC+1)|
 |Bi?|0x66|1|[a]|[]|IF a != 0 THEN PC+=\*(PC+1)|
 
