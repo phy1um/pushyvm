@@ -24,27 +24,38 @@ The TGT register is used as an intermediate location between completed calculati
 
 |Name|Op|Arg|Stack Before|Stack After|Description|
 |---|---|---|---|---|---|
-|Add|0x2|0|[a b]|[c]| c = a+b|
-|Sub|0x4|0|[a b]|[c]| c = a-b|
-|Mul|0x6|0|[a b]|[c]| c = a\*b|
-|Div|0x8|0|[a b]|[c]| c = a / b|
-|Mod|0xa|0|[a b]|[c]| c = a % b|
+|Add|0a2|0b00aabbcc|?|?| c = a+b|
+|Sub|0a4|0b00aabbcc|?|?| c = a-b|
+|Mul|0a6|0b00aabbcc|?|?| c = a\*b|
+|Div|0a8|0b00aabbcc|?|?| c = a / b|
+|Mod|0aa|0b00aabbcc|?|?| c = a % b|
+|And|0x2e|0b00aabbcc|?|?|c = a & b|
+|Orr|0x30|0b00aabbcc|?|?|c = a \| b|
+|Xor|0x32|0b00aabbcc|?|?|c = a XOR b|
 
-If Arg=1 then the TGT register is set to the result and nothing is pushed to the stack
+
+Where the operands a,b and destination c are determined by the following table of bit patterns in Arg:
+
+| Bits | Target |
+| --- | --- |
+| 00  | Top of stack (a always popped before b)|
+| 01  | TGT reigster |
+| 10  | SP |
+| 11  | PC |
 
 
 ## Stack Manipulation
 |Name|Op|Arg|Stack Before|Stack After|Description|
 |---|---|---|---|---|---|
 |Ldi|0x50|a|[]|[a]|RAM[SP--] = a|
-|Ldp|0x52|?|[]|[a]|RAM[SP--] = RAM[PC+1]; PC += 2; (Load 2 byte immediate from program to stack)|
+|Ldp|0x52|?|[]|[a]|RAM[SP--] = RAM[PC+1], PC += 2; (Load 2 byte immediate from program to stack)|
 |Pop|0x54|0|[a]|[]|TGT = a|
 |Pop[x]|0x54|0x1-0xf|[a]|[]|Port[x] <- a|
 |Dup|0x56|?|[a]|[a a]|v=RAM[SP]; RAM[SP--]v;|
-|Rot|0x58|?|[a b c]|[b c a]|Rotate top 3 elements of stack|
-|Swp|0x5a|?|[a b]|[b a]|Swap head elements|
+|Rot|0x58|?|[a b c]|[b c a]|Rotate top 3 elements of stack; TMP1 = RAM[SP++], TMP2 = RAM[SP++], TMP3 = RAM[SP++], RAM[SP--] = TMP1, RAM[SP--] = TMP3, RAM[SP--] = TMP2|
+|Swp|0x5a|?|[a b]|[b a]|Swap head elements; TMP1 = RAM[SP++], TMP2 = RAM[SP++], RAM[SP--] = TMP1, RAM[SP--] = TMP2|
 |Del|0x5c|0|[a]|[]|SP++|
-|Psh|0x5e|0|[]|[a]|RAM[SP++] = TGT|
+|Psh|0x5e|0|[]|[a]|RAM[SP--] = TGT|
 
 |Ldm|0x40|0|[x]|[]| TGT = RAM[x]|
 |Set|0x42|0|[x]|[]| RAM[x] = TGT|
@@ -60,16 +71,13 @@ If Arg=1 then the TGT register is set to the result and nothing is pushed to the
 ## Logic
 |Name|Op|Arg|Stack Before|Stack After|Description|
 |---|---|---|---|---|---|
-|GT|0x20|0|[a b]|[c]|c = IF a > b THEN 1 ELSE 0|
+|GT>|0x20|0|[a b]|[c]|c = IF a > b THEN 1 ELSE 0|
 |GTE|0x22|1|[a b]|[c]|c = IF a >= b THEN 1 ELSE 0|
-|LT|0x24|0|[a b]|[c]|c = IF a < b THEN 1 ELSE 0|
+|LT<|0x24|0|[a b]|[c]|c = IF a < b THEN 1 ELSE 0|
 |LTE|0x26|1|[a b]|[c]|c = IF a <= b THEN 1 ELSE 0|
-|EQ|0x28|0|[a b]|[c]|c = IF a = b THEN 1 ELSE 0|
+|EQ=|0x28|0|[a b]|[c]|c = IF a = b THEN 1 ELSE 0|
 |NEQ|0x2a|1|[a b]|[c]|c = IF a != b THEN 1 ELSE 0|
 |NOT|0x2c|0|[a]|[b]|b = IF a != 0 THEN 0 ELSE 1|
-|AND|0x2e|0|[a b]|[c]|c = a & b|
-|OR|0x30|0|[a b]|[c]|c = a \| b|
-|XOR|0x32|0|[a b]|[c]|c = a XOR b|
 |SHL|0x34|x|[a]|[c]|c = a << x|
 |SHR|0x36|x|[a]|[c]|c = a >> x|
 
