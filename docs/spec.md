@@ -24,11 +24,11 @@ The TGT register is used as an intermediate location between completed calculati
 
 |Name|Op|Arg|Stack Before|Stack After|Description|
 |---|---|---|---|---|---|
-|Add|0a2|0b00aabbcc|?|?| c = a+b|
-|Sub|0a4|0b00aabbcc|?|?| c = a-b|
-|Mul|0a6|0b00aabbcc|?|?| c = a\*b|
-|Div|0a8|0b00aabbcc|?|?| c = a / b|
-|Mod|0aa|0b00aabbcc|?|?| c = a % b|
+|Add|0x02|0b00aabbcc|?|?| c = a+b|
+|Sub|0x04|0b00aabbcc|?|?| c = a-b|
+|Mul|0x06|0b00aabbcc|?|?| c = a\*b|
+|Div|0x08|0b00aabbcc|?|?| c = a / b|
+|Mod|0x0a|0b00aabbcc|?|?| c = a % b|
 |And|0x2e|0b00aabbcc|?|?|c = a & b|
 |Orr|0x30|0b00aabbcc|?|?|c = a \| b|
 |Xor|0x32|0b00aabbcc|?|?|c = a XOR b|
@@ -43,15 +43,14 @@ Where the operands a,b and destination c are determined by the following table o
 | 10  | SP |
 | 11  | PC |
 
-
 ## Stack Manipulation
 |Name|Op|Arg|Stack Before|Stack After|Description|
 |---|---|---|---|---|---|
 |Ldi|0x50|a|[]|[a]|RAM[SP--] = a|
 |Ldp|0x52|?|[]|[a]|RAM[SP--] = RAM[PC+1], PC += 2; (Load 2 byte immediate from program to stack)|
-|Pop|0x54|0|[a]|[]|TGT = a|
+|Pop|0x54|0|[a]|[]|TGT = RAM[SP++]|
 |Pop[x]|0x54|0x1-0xf|[a]|[]|Port[x] <- a|
-|Dup|0x56|?|[a]|[a a]|v=RAM[SP]; RAM[SP--]v;|
+|Dup|0x56|?|[a]|[a a]|TMP1=RAM[SP]; RAM[SP--]=TMP1;|
 |Rot|0x58|?|[a b c]|[b c a]|Rotate top 3 elements of stack; TMP1 = RAM[SP++], TMP2 = RAM[SP++], TMP3 = RAM[SP++], RAM[SP--] = TMP1, RAM[SP--] = TMP3, RAM[SP--] = TMP2|
 |Swp|0x5a|?|[a b]|[b a]|Swap head elements; TMP1 = RAM[SP++], TMP2 = RAM[SP++], RAM[SP--] = TMP1, RAM[SP--] = TMP2|
 |Del|0x5c|0|[a]|[]|SP++|
@@ -65,8 +64,7 @@ Where the operands a,b and destination c are determined by the following table o
 |---|---|---|---|---|---|
 |Jmp|0x60|0|[a]|[]|PC=a|
 |Jmr|0x60|1|[a]|[]|PC+=a|
-|Bx?|0x64|0|[a b]|[]|IF b != 0 THEN PC=a|
-|Bx?|0x64|1|[a b]|[]|IF b != 0 THEN PC+=a|
+|Bx?|0x62|0|[a]|[]|IF b != 0 THEN PC+=2|
 
 ## Logic
 |Name|Op|Arg|Stack Before|Stack After|Description|
